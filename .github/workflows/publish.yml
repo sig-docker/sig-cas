@@ -1,0 +1,40 @@
+name: CI
+
+on:
+  push:
+    branches: [ main ]
+  
+  # Allows you to run this workflow manually from the Actions tab
+  workflow_dispatch:
+
+env:
+  # TODO: Compute this using cas-version and https://casinit.herokuapp.com/actuator/supportedVersions
+  BOOT_VERSION: 2.5.4
+  
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    
+    strategy:
+      matrix:
+        jdk: ['11']
+
+        # TODO: Generate CAS & boot versions from this
+        # curl https://casinit.herokuapp.com/actuator/supportedVersions | jq
+        cas-version: [ '6.4.5' ]
+        
+        # TODO: Generate labeled sets of these
+        cas-deps: ['core,ldap,jsonsvc']
+
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Setup Java JDK
+        uses: actions/setup-java@v2.5.0
+        with:
+          java-version: ${{ matrix.jdk }}
+          java-package: jdk
+          architecture: x64
+          
+      - name: Download overlay
+        run: curl https://casinit.herokuapp.com/starter.tgz -d "dependencies=${{ matrix.cas-deps }}&casVersion=${{ matrix.cas-version }}&bootVersion=${BOOT_VERSION}" | tar  -xzvf -
