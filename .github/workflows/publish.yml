@@ -39,3 +39,5 @@ jobs:
 
       - name: Download overlay
         run: curl https://casinit.herokuapp.com/starter.tgz -d "dependencies=${{ matrix.cas-deps }}&casVersion=${{ matrix.cas-version }}&bootVersion=${BOOT_VERSION}" | tar  -xzvf -
+
+      - run: ls -la
