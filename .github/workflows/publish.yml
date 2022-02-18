@@ -29,6 +29,10 @@ jobs:
     steps:
       - uses: actions/checkout@v2
 
+      - name: Get short commit hash
+        id: shortSha
+        run: echo "::set-output name=sha_short::$(git rev-parse --short HEAD)"
+
       - name: Setup Java JDK
         uses: actions/setup-java@v2.5.0
         with:
@@ -43,8 +47,32 @@ jobs:
       - name: Add keystore to Dockerfile
         run: echo 'RUN keytool -genkeypair -keyalg RSA -dname "CN=localhost,O=SelfSigned,L=San Diego,ST=California,C=US" -validity 1825 -keysize 2048 -keystore /etc/cas/thekeystore -storepass changeit -keypass changeit' >>Dockerfile
 
+      # TODO: Replace 'ldap' with opt label
+      - name: Compute Docker tag
+        id: vars
+        run: echo ::set-output name=tag::jdk${{ matrix.jdk }}-cas${{ matrix.cas-version }}-ldap
+
+      - name: Docker Hub Login
+        uses: docker/login-action@v1.9.0
+        with:
+          username: ${{ secrets.DOCKER_HUB_USERNAME }}
+          password: ${{ secrets.DOCKER_HUB_ACCESS_TOKEN }}
+
       - name: Build image
         uses: docker/build-push-action@v2
         with:
           context: .
-          tags: sigcorp/cas:latest
+          tags: sigcorp/cas:${{ steps.vars.outputs.tag }}
+
+      # TODO: Replace 'ldap' with opt label
+      - name: Push to Docker Hub
+        if: ${{ github.ref == 'refs/heads/main' }}
+        uses: docker/build-push-action@v2
+        with:
+          context: .
+          push: true
+          tags: |
+            sigcorp/cas:${{ steps.vars.outputs.tag }}
+            sigcorp/cas:${{ steps.vars.outputs.tag }}-${{ steps.shortSha.outputs.sha_short }}
+            sigcorp/cas:${{ steps.vars.outputs.tag }}-${{ github.run_number }}
+            sigcorp/cas:latest-ldap
