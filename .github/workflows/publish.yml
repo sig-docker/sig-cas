@@ -50,11 +50,14 @@ jobs:
           BOOT_VER=$(echo ${{ matrix.cas-boot-version }}|cut -d / -f 2)
           TAG_DEPS=$(echo ${CAS_DEPS#core,}|tr , -)
           TAG_BASE=jdk${{ matrix.jdk }}-cas${CAS_VER}-${TAG_DEPS}
+          TAG_HASH=$TAG_BASE-$SHA_SHORT
           SHA_SHORT=$(git rev-parse --short HEAD)
+          REG=https://registry.hub.docker.com/v1/repositories/sigcorp/cas/tags
           echo "::set-output name=cas-version::$CAS_VER"
           echo "::set-output name=boot-version::$BOOT_VER"
           echo "::set-output name=tag-base::$TAG_BASE"
-          echo "::set-output name=tag-hash::$TAG_BASE-$SHA_SHORT"
+          echo "::set-output name=tag-hash::$TAG_HASH"
+          echo "::set-output name=tag-pushed::$(curl $REG |jq '[.[]|select(.name==\"${TAG_HASH}\")]|length')"
 
       - name: Dump vars
         env:
