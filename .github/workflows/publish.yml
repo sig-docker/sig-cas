@@ -15,7 +15,7 @@ jobs:
   prep:
     runs-on: ubuntu-latest
     outputs:
-      matrix: ${{ steps.set-versions.outputs.versions }}
+      versions: ${{ steps.set-versions.outputs.versions }}
     steps:
       - name: Compute which versions to build
         id: set-versions
