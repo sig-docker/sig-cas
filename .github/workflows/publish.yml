@@ -12,7 +12,17 @@ env:
   BOOT_VERSION: 2.5.4
 
 jobs:
+  prep:
+    runs-on: ubuntu-latest
+    outputs:
+      matrix: ${{ steps.set-versions.outputs.versions }}
+    steps:
+      - name: Compute which versions to build
+        id: set-versions
+        run: echo "::set-output name=versions::$(curl https://casinit.herokuapp.com/actuator/supportedVersions|jq '[.[]|[.version,.bootVersion]|join("/")]' -c)"
+
   build:
+    needs: prep
     runs-on: ubuntu-latest
 
     strategy:
@@ -21,7 +31,7 @@ jobs:
 
         # TODO: Generate CAS & boot versions from this
         # curl https://casinit.herokuapp.com/actuator/supportedVersions | jq
-        cas-version: ["6.4.5"]
+        cas-boot-version: ${{ fromJson(needs.prep.outputs.versions) }}
 
         # NOTE: Always put "core," at the front of the deps list.
         cas-deps: ["core,ldap,jsonsvc"]
@@ -45,6 +55,8 @@ jobs:
         env:
           VARS: ${{ toJson(steps.vars.outputs) }}
         run: echo -e "$VARS\n"
+
+      # TODO: Now that we have the tag we're building, check the registry before continuing.
 
       # - name: Setup Java JDK
       #   uses: actions/setup-java@v2.5.0
