@@ -49,7 +49,7 @@ jobs:
           CAS_VER=$(echo ${{ matrix.cas-boot-version }}|cut -d / -f 1)
           BOOT_VER=$(echo ${{ matrix.cas-boot-version }}|cut -d / -f 2)
           TAG_DEPS=$(echo ${CAS_DEPS#core,}|tr , -)
-          TAG_BASE=jdk${{ matrix.jdk }}-cas${CAS_VER}-${TAG_DEPS}
+          TAG_BASE=${CAS_VER}-jdk${{ matrix.jdk }}-${TAG_DEPS}
           SHA_SHORT=$(git rev-parse --short HEAD)
           TAG_HASH=$TAG_BASE-$SHA_SHORT
           REG=https://registry.hub.docker.com/v1/repositories/sigcorp/cas/tags
