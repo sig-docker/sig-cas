@@ -46,6 +46,9 @@ jobs:
         env:
           CAS_DEPS: ${{ matrix.cas-deps }}
         run: |
+          echo "curling"
+          curl $REG |jq '[.[]|select(.name==\"${TAG_HASH}\")]|length'
+          echo "---"
           CAS_VER=$(echo ${{ matrix.cas-boot-version }}|cut -d / -f 1)
           BOOT_VER=$(echo ${{ matrix.cas-boot-version }}|cut -d / -f 2)
           TAG_DEPS=$(echo ${CAS_DEPS#core,}|tr , -)
