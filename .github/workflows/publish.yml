@@ -21,6 +21,11 @@ jobs:
         id: set-versions
         run: echo "::set-output name=versions::$(curl https://casinit.herokuapp.com/actuator/supportedVersions|jq '[.[]|[.version,.bootVersion]|join("/")]' -c)"
 
+      - name: Dump results
+        env:
+          VARS: ${{ toJson(steps.set-versions.outputs) }}
+        run: echo -e "$VARS\n"
+
   build:
     needs: prep
     runs-on: ubuntu-latest
