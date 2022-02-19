@@ -50,9 +50,13 @@ jobs:
         env:
           CAS_DEPS: ${{ matrix.cas-deps }}
         run: |
+          CAS_VER=$(echo ${{ matrix.cas-boot-version }}|cut -d / -f 1)
+          BOOT_VER=$(echo ${{ matrix.cas-boot-version }}|cut -d / -f 2)
           TAG_DEPS=$(echo ${CAS_DEPS#core,}|tr , -)
-          TAG_BASE=jdk${{ matrix.jdk }}-cas${{ matrix.cas-version }}-$TAG_DEPS
+          TAG_BASE=jdk${{ matrix.jdk }}-cas${CAS_VER}-${TAG_DEPS}
           SHA_SHORT=$(git rev-parse --short HEAD)
+          echo "::set-output name=cas-version::$CAS_VER"
+          echo "::set-output name=boot-version::$BOOT_VER"
           echo "::set-output name=tag-base::$TAG_BASE"
           echo "::set-output name=tag-hash::$TAG_BASE-$SHA_SHORT"
 
