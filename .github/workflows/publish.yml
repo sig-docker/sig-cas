@@ -33,10 +33,11 @@ jobs:
         id: shortSha
         run: echo "::set-output name=sha_short::$(git rev-parse --short HEAD)"
 
-      # TODO: Replace 'ldap' with opt label
       - name: Compute Docker tag
         id: vars
-        run: echo ::set-output name=tag::jdk${{ matrix.jdk }}-cas${{ matrix.cas-version }}-ldap
+        env:
+          CAS_DEPS: ${{ matrix.cas-deps }}
+        run: echo "::set-output name=tag::jdk${{ matrix.jdk }}-cas${{ matrix.cas-version }}-$(echo ${CAS_DEPS#core,}|tr , -)"
 
       - name: Dump vars
         env:
