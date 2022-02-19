@@ -46,9 +46,6 @@ jobs:
         env:
           CAS_DEPS: ${{ matrix.cas-deps }}
         run: |
-          echo "curling"
-          curl $REG |jq '[.[]|select(.name==\"${TAG_HASH}\")]|length'
-          echo "---"
           CAS_VER=$(echo ${{ matrix.cas-boot-version }}|cut -d / -f 1)
           BOOT_VER=$(echo ${{ matrix.cas-boot-version }}|cut -d / -f 2)
           TAG_DEPS=$(echo ${CAS_DEPS#core,}|tr , -)
@@ -56,6 +53,9 @@ jobs:
           TAG_HASH=$TAG_BASE-$SHA_SHORT
           SHA_SHORT=$(git rev-parse --short HEAD)
           REG=https://registry.hub.docker.com/v1/repositories/sigcorp/cas/tags
+          echo "curling"
+          curl $REG |jq '[.[]|select(.name==\"${TAG_HASH}\")]|length'
+          echo "---"
           echo "::set-output name=cas-version::$CAS_VER"
           echo "::set-output name=boot-version::$BOOT_VER"
           echo "::set-output name=tag-base::$TAG_BASE"
