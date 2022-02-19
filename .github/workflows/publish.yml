@@ -23,21 +23,23 @@ jobs:
         # curl https://casinit.herokuapp.com/actuator/supportedVersions | jq
         cas-version: ["6.4.5"]
 
-        # TODO: Generate labeled sets of these
+        # NOTE: Always put "core," at the front of the deps list.
         cas-deps: ["core,ldap,jsonsvc"]
 
     steps:
       - uses: actions/checkout@v2
 
-      - name: Get short commit hash
-        id: shortSha
-        run: echo "::set-output name=sha_short::$(git rev-parse --short HEAD)"
-
+      # TODO: Compute which is the latest from web service
       - name: Compute Docker tag
         id: vars
         env:
           CAS_DEPS: ${{ matrix.cas-deps }}
-        run: echo "::set-output name=tag::jdk${{ matrix.jdk }}-cas${{ matrix.cas-version }}-$(echo ${CAS_DEPS#core,}|tr , -)"
+        run: |
+          TAG_DEPS=$(echo ${CAS_DEPS#core,}|tr , -)
+          TAG_BASE=jdk${{ matrix.jdk }}-cas${{ matrix.cas-version }}-$TAG_DEPS
+          SHA_SHORT=$(git rev-parse --short HEAD)
+          echo "::set-output name=tag-base::$TAG_BASE"
+          echo "::set-output name=tag-hash::$TAG_BASE-$SHA_SHORT"
 
       - name: Dump vars
         env:
