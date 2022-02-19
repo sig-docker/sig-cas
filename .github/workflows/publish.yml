@@ -7,10 +7,6 @@ on:
   # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
 
-env:
-  # TODO: Compute this using cas-version and https://casinit.herokuapp.com/actuator/supportedVersions
-  BOOT_VERSION: 2.5.4
-
 jobs:
   prep:
     runs-on: ubuntu-latest
@@ -67,31 +63,36 @@ jobs:
 
       # TODO: Now that we have the tag we're building, check the registry before continuing.
 
-      # - name: Setup Java JDK
-      #   uses: actions/setup-java@v2.5.0
-      #   with:
-      #     java-version: ${{ matrix.jdk }}
-      #     java-package: jdk
-      #     distribution: temurin
-      #     architecture: x64
+      - name: Setup Java JDK
+        uses: actions/setup-java@v2.5.0
+        with:
+          java-version: ${{ matrix.jdk }}
+          java-package: jdk
+          distribution: temurin
+          architecture: x64
 
-      # - name: Download overlay
-      #   run: curl https://casinit.herokuapp.com/starter.tgz -d "dependencies=${{ matrix.cas-deps }}&casVersion=${{ matrix.cas-version }}&bootVersion=${BOOT_VERSION}" | tar  -xzvf -
+      - name: Download overlay
+        env:
+          URL: https://casinit.herokuapp.com/starter.tgz
+          CAS: ${{ steps.vars.outputs.cas-version }}
+          BOOT: ${{ steps.vars.outputs.boot-version }}
+          DEPS: ${{ matrix.cas-deps }}
+        run: curl $URL -d "dependencies=${DEPS}&casVersion=${CAS}&bootVersion=${BOOT}" | tar  -xzvf -
 
-      # - name: Add keystore to Dockerfile
-      #   run: echo 'RUN keytool -genkeypair -keyalg RSA -dname "CN=localhost,O=SelfSigned,L=San Diego,ST=California,C=US" -validity 1825 -keysize 2048 -keystore /etc/cas/thekeystore -storepass changeit -keypass changeit' >>Dockerfile
+      - name: Add keystore to Dockerfile
+        run: echo 'RUN keytool -genkeypair -keyalg RSA -dname "CN=localhost,O=SelfSigned,L=San Diego,ST=California,C=US" -validity 1825 -keysize 2048 -keystore /etc/cas/thekeystore -storepass changeit -keypass changeit' >>Dockerfile
 
-      # - name: Docker Hub Login
-      #   uses: docker/login-action@v1.9.0
-      #   with:
-      #     username: ${{ secrets.DOCKER_HUB_USERNAME }}
-      #     password: ${{ secrets.DOCKER_HUB_ACCESS_TOKEN }}
+      - name: Docker Hub Login
+        uses: docker/login-action@v1.9.0
+        with:
+          username: ${{ secrets.DOCKER_HUB_USERNAME }}
+          password: ${{ secrets.DOCKER_HUB_ACCESS_TOKEN }}
 
-      # - name: Build image
-      #   uses: docker/build-push-action@v2
-      #   with:
-      #     context: .
-      #     tags: sigcorp/cas:${{ steps.vars.outputs.tag }}
+      - name: Build image
+        uses: docker/build-push-action@v2
+        with:
+          context: .
+          tags: sigcorp/cas:${{ steps.vars.outputs.tag-base }}
 
       # # TODO: Replace 'ldap' with opt label
       # - name: Push to Docker Hub
