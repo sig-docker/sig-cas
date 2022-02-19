@@ -15,7 +15,7 @@ jobs:
     steps:
       - name: Compute which versions to build
         id: set-versions
-        run: echo "::set-output name=versions::$(curl https://casinit.herokuapp.com/actuator/supportedVersions|jq '[.[]|select(.type==\"cas\")|[.version,.bootVersion]|join("/")]' -c)"
+        run: echo ::set-output name=versions::$(curl https://casinit.herokuapp.com/actuator/supportedVersions|jq '[.[]|select(.type=="cas")|[.version,.bootVersion]|join("/")]' -c)
 
       - name: Dump results
         env:
