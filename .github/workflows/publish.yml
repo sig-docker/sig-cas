@@ -99,15 +99,13 @@ jobs:
           context: .
           tags: sigcorp/cas:${{ steps.vars.outputs.tag-base }}
 
-      # # TODO: Replace 'ldap' with opt label
-      # - name: Push to Docker Hub
-      #   if: ${{ github.ref == 'refs/heads/main' }}
-      #   uses: docker/build-push-action@v2
-      #   with:
-      #     context: .
-      #     push: true
-      #     tags: |
-      #       sigcorp/cas:${{ steps.vars.outputs.tag }}
-      #       sigcorp/cas:${{ steps.vars.outputs.tag }}-${{ steps.shortSha.outputs.sha_short }}
-      #       sigcorp/cas:${{ steps.vars.outputs.tag }}-${{ github.run_number }}
-      #       sigcorp/cas:latest-ldap
+      - name: Push to Docker Hub
+        if: ${{ github.ref == 'refs/heads/main' }}
+        uses: docker/build-push-action@v2
+        with:
+          context: .
+          push: true
+          tags: |
+            sigcorp/cas:${{ steps.vars.outputs.tag-base }}
+            sigcorp/cas:${{ steps.vars.outputs.tag-hash }}
+            sigcorp/cas:${{ steps.vars.outputs.tag-base }}-${{ github.run_number }}
