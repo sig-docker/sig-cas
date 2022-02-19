@@ -38,7 +38,8 @@ jobs:
         id: vars
         run: echo ::set-output name=tag::jdk${{ matrix.jdk }}-cas${{ matrix.cas-version }}-ldap
 
-      - run: echo "${{ steps.vars.outputs }}"
+      - name: Dump context
+        uses: crazy-max/ghaction-dump-context@v1
 
       # - name: Setup Java JDK
       #   uses: actions/setup-java@v2.5.0
