@@ -50,8 +50,8 @@ jobs:
           BOOT_VER=$(echo ${{ matrix.cas-boot-version }}|cut -d / -f 2)
           TAG_DEPS=$(echo ${CAS_DEPS#core,}|tr , -)
           TAG_BASE=jdk${{ matrix.jdk }}-cas${CAS_VER}-${TAG_DEPS}
-          TAG_HASH=$TAG_BASE-$SHA_SHORT
           SHA_SHORT=$(git rev-parse --short HEAD)
+          TAG_HASH=$TAG_BASE-$SHA_SHORT
           REG=https://registry.hub.docker.com/v1/repositories/sigcorp/cas/tags
           echo "::set-output name=cas-version::$CAS_VER"
           echo "::set-output name=boot-version::$BOOT_VER"
