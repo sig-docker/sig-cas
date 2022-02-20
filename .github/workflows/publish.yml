@@ -35,7 +35,7 @@ jobs:
         cas-boot-version: ${{ fromJson(needs.prep.outputs.versions) }}
 
         # NOTE: Always put "core," at the front of the deps list.
-        cas-deps: ["core,ldap,jsonsvc"]
+        cas-deps: ["core,ldap,jsonsvc","core,ldap,jsonsvc,support-saml"]
 
     steps:
       - uses: actions/checkout@v2
