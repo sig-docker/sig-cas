@@ -57,7 +57,7 @@ jobs:
           echo "::set-output name=boot-version::$BOOT_VER"
           echo "::set-output name=tag-base::$TAG_BASE"
           echo "::set-output name=tag-hash::$TAG_HASH"
-          echo "::set-output name=tag-pushed::$(curl $REG |jq '[.[]|select(.name=="${TAG_HASH}")]|length')"
+          echo "::set-output name=tag-pushed::$(curl -q -s $REG |jq '[.[]|select(.name=="'${TAG_HASH}'")]|length')"
 
       - name: Dump vars
         env:
