@@ -100,7 +100,7 @@ jobs:
           tags: sigcorp/cas:${{ steps.vars.outputs.tag-base }}
 
       - name: Push to Docker Hub
-        if: ${{ github.ref == 'refs/heads/main' }}
+        if: steps.vars.outputs.tag-pushed == '0' and ${{ github.ref == 'refs/heads/main' }}
         uses: docker/build-push-action@v2
         with:
           context: .
